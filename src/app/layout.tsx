@@ -6,7 +6,7 @@ import { AccessibilityProvider } from '@/components/AccessibilityProvider'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Accessible Assist - Empowering Digital Accessibility',
+  title: 'JeetAble - Empowering Digital Accessibility',
   description: 'A comprehensive platform helping disabled users learn, communicate, and navigate the web with ease.',
   keywords: 'accessibility, disability support, voice assistant, deaf mode, learning hub',
   viewport: 'width=device-width, initial-scale=1',

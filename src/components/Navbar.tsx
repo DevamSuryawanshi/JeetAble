@@ -22,12 +22,12 @@ export default function Navbar() {
               href="/" 
               className="flex items-center space-x-2 focus:outline-none focus-visible"
               onClick={() => handleNavClick('home')}
-              aria-label="Accessible Assist Home"
+              aria-label="JeetAble Home"
             >
               <div className="w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center">
-                <span className="text-white font-bold text-sm" aria-hidden="true">AA</span>
+                <span className="text-white font-bold text-sm" aria-hidden="true">JA</span>
               </div>
-              <span className="text-xl font-bold text-gray-900">Accessible Assist</span>
+              <span className="text-xl font-bold text-gray-900">JeetAble</span>
             </Link>
           </div>
 

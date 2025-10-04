@@ -10,7 +10,7 @@ export default function Home() {
   const { speak } = useAccessibility()
 
   useEffect(() => {
-    speak('Welcome to Accessible Assist. Your digital accessibility companion.')
+    speak('Welcome to JeetAble. Your digital accessibility companion.')
   }, [speak])
 
   const features = [
@@ -67,7 +67,7 @@ export default function Home() {
               and navigate the digital world with confidence and independence.
             </p>
             <button
-              onClick={() => speak('Welcome to Accessible Assist. This platform provides voice navigation, deaf mode support, learning resources, job opportunities, and emergency assistance for users with disabilities.')}
+              onClick={() => speak('Welcome to JeetAble. This platform provides voice navigation, deaf mode support, learning resources, job opportunities, and emergency assistance for users with disabilities.')
               className="bg-primary-500 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-primary-600 focus:outline-none focus-visible transition-colors mr-4"
               aria-label="Play welcome message"
             >
@@ -134,7 +134,7 @@ export default function Home() {
         <div className="max-w-6xl mx-auto px-4">
           <div className="grid md:grid-cols-3 gap-8">
             <div>
-              <h3 className="text-xl font-semibold mb-4">Accessible Assist</h3>
+              <h3 className="text-xl font-semibold mb-4">JeetAble</h3>
               <p className="text-gray-300">
                 Empowering digital accessibility for everyone.
               </p>
@@ -157,7 +157,7 @@ export default function Home() {
             </div>
           </div>
           <div className="border-t border-gray-700 mt-8 pt-8 text-center text-gray-300">
-            <p>&copy; 2024 Accessible Assist. All rights reserved.</p>
+            <p>&copy; 2024 JeetAble. All rights reserved.</p>
           </div>
         </div>
       </footer>
