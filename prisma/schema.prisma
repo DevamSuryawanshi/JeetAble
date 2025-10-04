@@ -1,0 +1,61 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id                String   @id @default(cuid())
+  email             String   @unique
+  name              String
+  password          String
+  accessibilityNeeds String[] // JSON array of accessibility needs
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  // Relations
+  jobApplications   JobApplication[]
+  feedbacks         Feedback[]
+}
+
+model Job {
+  id              String   @id @default(cuid())
+  title           String
+  company         String
+  location        String
+  type            String
+  accessibility   String[] // JSON array of accessibility features
+  description     String
+  salary          String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  // Relations
+  applications    JobApplication[]
+}
+
+model JobApplication {
+  id        String   @id @default(cuid())
+  userId    String
+  jobId     String
+  status    String   @default("pending")
+  appliedAt DateTime @default(now())
+  
+  // Relations
+  user      User     @relation(fields: [userId], references: [id])
+  job       Job      @relation(fields: [jobId], references: [id])
+}
+
+model Feedback {
+  id        String   @id @default(cuid())
+  userId    String?
+  type      String   // accessibility, bug, feature, etc.
+  message   String
+  createdAt DateTime @default(now())
+  
+  // Relations
+  user      User?    @relation(fields: [userId], references: [id])
+}
