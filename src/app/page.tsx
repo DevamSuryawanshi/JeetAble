@@ -67,7 +67,7 @@ export default function Home() {
               and navigate the digital world with confidence and independence.
             </p>
             <button
-              onClick={() => speak('Welcome to JeetAble. This platform provides voice navigation, deaf mode support, learning resources, job opportunities, and emergency assistance for users with disabilities.')
+              onClick={() => speak('Welcome to JeetAble. This platform provides voice navigation, deaf mode support, learning resources, job opportunities, and emergency assistance for users with disabilities.')}
               className="bg-primary-500 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-primary-600 focus:outline-none focus-visible transition-colors mr-4"
               aria-label="Play welcome message"
             >
