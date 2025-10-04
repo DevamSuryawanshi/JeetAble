@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import '@/styles/globals.css'
 import { AccessibilityProvider } from '@/components/AccessibilityProvider'
-import AIAgent from '@/components/AIAgent'
+import HumanLikeAIAgent from '@/components/HumanLikeAIAgent'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -23,7 +23,7 @@ export default function RootLayout({
       <body className={inter.className}>
         <AccessibilityProvider>
           {children}
-          <AIAgent />
+          <HumanLikeAIAgent />
         </AccessibilityProvider>
       </body>
     </html>
