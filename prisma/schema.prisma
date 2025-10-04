@@ -12,7 +12,7 @@ model User {
   email             String   @unique
   name              String
   password          String
-  accessibilityNeeds String[] // JSON array of accessibility needs
+  accessibilityNeeds String // JSON string of accessibility needs
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
   
@@ -27,7 +27,7 @@ model Job {
   company         String
   location        String
   type            String
-  accessibility   String[] // JSON array of accessibility features
+  accessibility   String // JSON string of accessibility features
   description     String
   salary          String
   createdAt       DateTime @default(now())
