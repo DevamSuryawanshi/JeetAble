@@ -2,7 +2,11 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import '@/styles/globals.css'
 import { AccessibilityProvider } from '@/components/AccessibilityProvider'
-import HumanLikeAIAgent from '@/components/HumanLikeAIAgent'
+import dynamic from 'next/dynamic'
+
+const HumanLikeAIAgent = dynamic(() => import('@/components/HumanLikeAIAgent'), {
+  ssr: false
+})
 
 const inter = Inter({ subsets: ['latin'] })
 
