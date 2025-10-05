@@ -143,7 +143,7 @@ export default function EmergencyHelpAndSupportIndia() {
 
   const findNearbyServices = async (location: UserLocation, serviceType: string) => {
     try {
-      const response = await fetch('/api/emergency-services-india', {
+      const response = await fetch('/api/getNearbyPlaces', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -158,17 +158,30 @@ export default function EmergencyHelpAndSupportIndia() {
 
       if (response.ok) {
         const data = await response.json()
-        setServices(data.services || [])
-        speak(`Found ${data.services?.length || 0} ${serviceType} services nearby`)
+        const mappedServices = data.places?.map((place: any) => ({
+          id: place.id,
+          name: place.name,
+          type: place.type,
+          distance: place.distance,
+          address: place.address,
+          lat: place.lat,
+          lng: place.lng,
+          phone: place.phone,
+          rating: place.rating
+        })) || []
+        
+        setServices(mappedServices)
+        speak(`Found ${mappedServices.length} real ${serviceType} services nearby`)
         
         if (mapLoaded && googleMapRef.current) {
-          displayServicesOnMap(data.services || [], location)
+          displayServicesOnMap(mappedServices, location)
         }
       } else {
         throw new Error('Failed to fetch services')
       }
     } catch (error) {
       console.error('Error fetching services:', error)
+      speak('Unable to fetch real-time data. Showing sample services.')
       loadMockIndianData()
     } finally {
       setIsLoading(false)
@@ -328,6 +341,26 @@ export default function EmergencyHelpAndSupportIndia() {
     }
   }
 
+  // Voice command integration
+  useEffect(() => {
+    const handleVoiceCommand = (event: CustomEvent) => {
+      const command = event.detail.toLowerCase()
+      
+      if (command.includes('hospital') || command.includes('हॉस्पिटल') || command.includes('रुग्णालय')) {
+        findNearbyByType('hospital')
+      } else if (command.includes('police') || command.includes('पुलिस') || command.includes('पोलीस')) {
+        findNearbyByType('police')
+      } else if (command.includes('fire') || command.includes('आग') || command.includes('अग्निशमन')) {
+        findNearbyByType('fire')
+      } else if (command.includes('clinic') || command.includes('क्लिनिक') || command.includes('दवाखाना')) {
+        findNearbyByType('clinic')
+      }
+    }
+
+    window.addEventListener('voiceCommand', handleVoiceCommand as EventListener)
+    return () => window.removeEventListener('voiceCommand', handleVoiceCommand as EventListener)
+  }, [userLocation])
+
   return (
     <div className="max-w-7xl mx-auto p-6 bg-white">
       {/* Header */}
@@ -387,7 +420,7 @@ export default function EmergencyHelpAndSupportIndia() {
             {isLoading ? (
               <>
                 <span className="animate-spin inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full mr-2"></span>
-                Detecting...
+                Finding Services...
               </>
             ) : (
               '📍 Detect My Location'
@@ -396,8 +429,14 @@ export default function EmergencyHelpAndSupportIndia() {
           
           <select
             value={selectedServiceType}
-            onChange={(e) => setSelectedServiceType(e.target.value)}
+            onChange={(e) => {
+              setSelectedServiceType(e.target.value)
+              if (userLocation) {
+                findNearbyServices(userLocation, e.target.value)
+              }
+            }}
             className="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            disabled={isLoading}
           >
             {SERVICE_TYPES.map((type) => (
               <option key={type.value} value={type.value}>
@@ -411,9 +450,17 @@ export default function EmergencyHelpAndSupportIndia() {
             disabled={!userLocation || isLoading}
             className="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 focus:outline-none focus:ring-4 focus:ring-green-300 disabled:opacity-50 transition-colors"
           >
-            🔍 Search Services
+            {isLoading ? 'Searching...' : '🔍 Search Real Services'}
           </button>
         </div>
+
+        {userLocation && (
+          <div className="text-center mb-4">
+            <p className="text-sm text-gray-600">
+              📍 Your location: {userLocation.lat.toFixed(4)}, {userLocation.lng.toFixed(4)}
+            </p>
+          </div>
+        )}
 
         {error && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6" role="alert">
@@ -422,13 +469,30 @@ export default function EmergencyHelpAndSupportIndia() {
         )}
       </div>
 
+      {/* No Results Message */}
+      {!isLoading && userLocation && services.length === 0 && (
+        <div className="text-center py-8 bg-yellow-50 rounded-lg mb-8">
+          <div className="text-4xl mb-4">🔍</div>
+          <h3 className="text-xl font-semibold text-gray-900 mb-2">No nearby services found</h3>
+          <p className="text-gray-600 mb-4">
+            No {SERVICE_TYPES.find(t => t.value === selectedServiceType)?.label.toLowerCase()} found within 5km radius.
+          </p>
+          <button
+            onClick={() => findNearbyServices(userLocation, selectedServiceType)}
+            className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 transition-colors"
+          >
+            Try Again
+          </button>
+        </div>
+      )}
+
       {/* Services Results */}
       {services.length > 0 && (
         <div className="grid lg:grid-cols-2 gap-8">
           {/* Services List */}
           <div className="space-y-4">
             <h3 className="text-2xl font-semibold text-gray-900 mb-4">
-              📋 Found {services.length} Services
+              📋 Found {services.length} Real-time {SERVICE_TYPES.find(t => t.value === selectedServiceType)?.label}
             </h3>
             
             {services.map((service) => {
