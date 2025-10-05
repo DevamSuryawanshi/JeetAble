@@ -43,18 +43,11 @@ export default function Home() {
       color: 'bg-orange-500'
     },
     {
-      title: 'Emergency Help',
-      description: 'Quick access to emergency services and support',
+      title: '🇮🇳 Emergency Help & Support (India)',
+      description: 'Indian emergency numbers and nearby services',
       icon: '🚨',
       href: '/help',
       color: 'bg-red-500'
-    },
-    {
-      title: 'Emergency Help (India)',
-      description: 'Indian emergency numbers and nearby services',
-      icon: '🇮🇳',
-      href: '/emergency-india',
-      color: 'bg-orange-600'
     }
   ]
 
