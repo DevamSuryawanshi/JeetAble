@@ -68,6 +68,9 @@ export default function EmergencyHelpAndSupportIndia() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
   const [mapLoaded, setMapLoaded] = useState(false)
+  const [locationStatus, setLocationStatus] = useState<'idle' | 'detecting' | 'granted' | 'denied' | 'error'>('idle')
+  const [manualSearch, setManualSearch] = useState('')
+  const [showManualSearch, setShowManualSearch] = useState(false)
   
   const mapRef = useRef<HTMLDivElement>(null)
   const googleMapRef = useRef<google.maps.Map | null>(null)
@@ -94,48 +97,70 @@ export default function EmergencyHelpAndSupportIndia() {
 
   const detectLocation = () => {
     setIsLoading(true)
+    setLocationStatus('detecting')
     setError('')
+    setShowManualSearch(false)
+    
+    console.log('Starting location detection...')
+    speak('Detecting your current location... please wait.')
     
     if (!navigator.geolocation) {
-      setError('Geolocation is not supported by this browser')
+      const errorMsg = 'Geolocation is not supported by this browser'
+      console.error('Geolocation not supported')
+      setError(errorMsg)
+      setLocationStatus('error')
       setIsLoading(false)
-      speak('Geolocation is not supported by this browser')
+      setShowManualSearch(true)
+      speak(errorMsg)
       return
     }
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
+        console.log('Location permission granted', position.coords)
         const location = {
           lat: position.coords.latitude,
           lng: position.coords.longitude
         }
         setUserLocation(location)
+        setLocationStatus('granted')
+        setError('')
         findNearbyServices(location, selectedServiceType)
-        speak('Location detected. Finding nearby services.')
+        speak('Location detected successfully. Showing nearby emergency services.')
       },
       (error) => {
-        let errorMessage = 'Unable to get your location'
+        console.error('Location error:', error)
+        let errorMessage = 'Unable to detect your location'
+        let status: 'denied' | 'error' = 'error'
+        
         switch (error.code) {
           case error.PERMISSION_DENIED:
-            errorMessage = 'Location access denied. Please enable location services.'
+            errorMessage = 'Location access is blocked. Please enable it in your browser settings to show nearby services.'
+            status = 'denied'
+            console.log('Location permission denied by user')
             break
           case error.POSITION_UNAVAILABLE:
-            errorMessage = 'Location information unavailable.'
+            errorMessage = 'Location information unavailable. You can search manually for services.'
+            console.log('Location position unavailable')
             break
           case error.TIMEOUT:
-            errorMessage = 'Location request timed out.'
+            errorMessage = 'Location request timed out. You can search manually for services.'
+            console.log('Location request timeout')
             break
+          default:
+            errorMessage = 'Unable to detect your location. You can search manually for services.'
+            console.log('Unknown location error:', error.message)
         }
-        setError(errorMessage)
-        setIsLoading(false)
-        speak(errorMessage)
         
-        // Load mock Indian data
-        loadMockIndianData()
+        setError(errorMessage)
+        setLocationStatus(status)
+        setIsLoading(false)
+        setShowManualSearch(true)
+        speak(errorMessage)
       },
       {
         enableHighAccuracy: true,
-        timeout: 10000,
+        timeout: 15000,
         maximumAge: 300000
       }
     )
@@ -183,6 +208,47 @@ export default function EmergencyHelpAndSupportIndia() {
       console.error('Error fetching services:', error)
       speak('Unable to fetch real-time data. Showing sample services.')
       loadMockIndianData()
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const searchManualLocation = async () => {
+    if (!manualSearch.trim()) {
+      speak('Please enter a city or area name')
+      return
+    }
+
+    setIsLoading(true)
+    setError('')
+    
+    try {
+      console.log('Searching for location:', manualSearch)
+      speak(`Searching for ${manualSearch}...`)
+      
+      // Use Google Geocoding API to get coordinates from city name
+      const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(manualSearch)}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`)
+      const data = await response.json()
+      
+      if (data.status === 'OK' && data.results.length > 0) {
+        const location = {
+          lat: data.results[0].geometry.location.lat,
+          lng: data.results[0].geometry.location.lng
+        }
+        
+        console.log('Manual location found:', location)
+        setUserLocation(location)
+        setLocationStatus('granted')
+        setShowManualSearch(false)
+        findNearbyServices(location, selectedServiceType)
+        speak(`Found ${manualSearch}. Searching for nearby services.`)
+      } else {
+        throw new Error('Location not found')
+      }
+    } catch (error) {
+      console.error('Manual search error:', error)
+      setError(`Could not find "${manualSearch}". Please try a different city or area name.`)
+      speak('Location not found. Please try a different city name.')
     } finally {
       setIsLoading(false)
     }
@@ -245,7 +311,8 @@ export default function EmergencyHelpAndSupportIndia() {
     const filteredServices = mockServices.filter(service => service.type === selectedServiceType)
     setServices(filteredServices)
     setUserLocation({ lat: 18.5204, lng: 73.8567 }) // Pune coordinates
-    speak(`Showing ${filteredServices.length} nearby ${selectedServiceType} services`)
+    setLocationStatus('granted')
+    speak(`Showing ${filteredServices.length} sample ${selectedServiceType} services`)
     
     if (mapLoaded) {
       displayServicesOnMap(filteredServices, { lat: 18.5204, lng: 73.8567 })
@@ -346,6 +413,13 @@ export default function EmergencyHelpAndSupportIndia() {
     const handleVoiceCommand = (event: CustomEvent) => {
       const command = event.detail.toLowerCase()
       
+      // Location detection commands
+      if (command.includes('detect location') || command.includes('find my location') || command.includes('मेरा लोकेशन') || command.includes('माझे ठिकाण')) {
+        detectLocation()
+        return
+      }
+      
+      // Service type commands
       if (command.includes('hospital') || command.includes('हॉस्पिटल') || command.includes('रुग्णालय')) {
         findNearbyByType('hospital')
       } else if (command.includes('police') || command.includes('पुलिस') || command.includes('पोलीस')) {
@@ -414,18 +488,29 @@ export default function EmergencyHelpAndSupportIndia() {
         <div className="flex flex-col md:flex-row gap-4 items-center justify-center mb-6">
           <button
             onClick={detectLocation}
-            disabled={isLoading}
+            disabled={isLoading || locationStatus === 'detecting'}
             className="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-4 focus:ring-blue-300 disabled:opacity-50 transition-colors"
           >
-            {isLoading ? (
+            {locationStatus === 'detecting' ? (
               <>
                 <span className="animate-spin inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full mr-2"></span>
-                Finding Services...
+                Detecting Location...
               </>
+            ) : locationStatus === 'granted' ? (
+              '📍 Update Location'
             ) : (
               '📍 Detect My Location'
             )}
           </button>
+          
+          {(locationStatus === 'denied' || locationStatus === 'error') && (
+            <button
+              onClick={() => setShowManualSearch(!showManualSearch)}
+              className="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-4 focus:ring-gray-300 transition-colors"
+            >
+              🔍 Search Manually
+            </button>
+          )}
           
           <select
             value={selectedServiceType}
@@ -454,17 +539,73 @@ export default function EmergencyHelpAndSupportIndia() {
           </button>
         </div>
 
-        {userLocation && (
+        {userLocation && locationStatus === 'granted' && (
           <div className="text-center mb-4">
             <p className="text-sm text-gray-600">
-              📍 Your location: {userLocation.lat.toFixed(4)}, {userLocation.lng.toFixed(4)}
+              📍 Current location: {userLocation.lat.toFixed(4)}, {userLocation.lng.toFixed(4)}
             </p>
           </div>
         )}
 
-        {error && (
+        {/* Location Status Messages */}
+        {locationStatus === 'detecting' && (
+          <div className="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded mb-6 flex items-center" role="status">
+            <span className="animate-spin inline-block w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full mr-3"></span>
+            📍 Detecting your current location... please wait.
+          </div>
+        )}
+        
+        {locationStatus === 'granted' && userLocation && (
+          <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6" role="status">
+            ✅ Location detected successfully. Showing nearby hospitals, police stations, and fire departments.
+          </div>
+        )}
+        
+        {locationStatus === 'denied' && (
+          <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded mb-6" role="alert">
+            ⚠️ Location access is blocked. Please enable it in your browser settings to show nearby services.
+          </div>
+        )}
+        
+        {locationStatus === 'error' && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6" role="alert">
+            🚫 Unable to detect your location. You can search manually for services.
+          </div>
+        )}
+        
+        {error && locationStatus !== 'detecting' && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6" role="alert">
             {error}
+          </div>
+        )}
+        
+        {/* Manual Search */}
+        {showManualSearch && (
+          <div className="bg-gray-100 border border-gray-300 rounded-lg p-6 mb-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-3">🔍 Manual Location Search</h3>
+            <p className="text-gray-600 mb-4">Enter your city or area to find nearby services manually:</p>
+            <div className="flex gap-3">
+              <input
+                type="text"
+                value={manualSearch}
+                onChange={(e) => setManualSearch(e.target.value)}
+                placeholder="Enter city name (e.g., Mumbai, Delhi, Pune)"
+                className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    searchManualLocation()
+                  }
+                }}
+                disabled={isLoading}
+              />
+              <button
+                onClick={searchManualLocation}
+                disabled={isLoading || !manualSearch.trim()}
+                className="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-4 focus:ring-blue-300 disabled:opacity-50 transition-colors"
+              >
+                {isLoading ? 'Searching...' : '🔍 Search'}
+              </button>
+            </div>
           </div>
         )}
       </div>
