@@ -48,6 +48,13 @@ export default function Home() {
       icon: '🚨',
       href: '/help',
       color: 'bg-red-500'
+    },
+    {
+      title: 'Emergency Help (India)',
+      description: 'Indian emergency numbers and nearby services',
+      icon: '🇮🇳',
+      href: '/emergency-india',
+      color: 'bg-orange-600'
     }
   ]
 
