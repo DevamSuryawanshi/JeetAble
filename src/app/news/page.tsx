@@ -52,6 +52,23 @@ export default function DailyNews() {
     speak(`${title}. ${description}`)
   }
 
+  const readFirst5News = () => {
+    if (news.length === 0) {
+      speak('No news available to read')
+      return
+    }
+    
+    const first5 = news.slice(0, 5)
+    let newsText = 'Here are the top 5 news headlines. '
+    
+    first5.forEach((item, index) => {
+      newsText += `Headline ${index + 1}: ${item.title}. `
+    })
+    
+    newsText += 'End of headlines.'
+    speak(newsText)
+  }
+
   const openArticle = (link: string, title: string) => {
     window.open(link, '_blank')
     speak(`Opening article: ${title}`)
@@ -80,7 +97,7 @@ export default function DailyNews() {
           )}
         </div>
 
-        <div className="flex justify-center mb-6">
+        <div className="flex flex-wrap justify-center gap-4 mb-6">
           <button
             onClick={fetchNews}
             disabled={isLoading}
@@ -94,6 +111,14 @@ export default function DailyNews() {
             ) : (
               '🔄 Refresh News'
             )}
+          </button>
+          
+          <button
+            onClick={() => readFirst5News()}
+            disabled={isLoading || news.length === 0}
+            className="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 focus:outline-none focus:ring-4 focus:ring-green-300 disabled:opacity-50 transition-colors"
+          >
+            🔊 Read First 5 Headlines
           </button>
         </div>
 
@@ -172,6 +197,7 @@ export default function DailyNews() {
           <div className="grid md:grid-cols-2 gap-4 text-blue-800">
             <div>• Large, bold headlines for better readability</div>
             <div>• Read Aloud feature using Web Speech API</div>
+            <div>• Read First 5 Headlines automatically</div>
             <div>• High contrast colors for visual clarity</div>
             <div>• Keyboard navigation support</div>
             <div>• Screen reader compatible</div>
