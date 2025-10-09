@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import '@/styles/globals.css'
 import { AccessibilityProvider } from '@/components/AccessibilityProvider'
+import LayoutWrapper from '@/components/LayoutWrapper'
 import dynamic from 'next/dynamic'
 
 const HumanLikeAIAgent = dynamic(() => import('@/components/HumanLikeAIAgent'), {
@@ -26,7 +27,9 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <AccessibilityProvider>
-          {children}
+          <LayoutWrapper>
+            {children}
+          </LayoutWrapper>
           <HumanLikeAIAgent />
         </AccessibilityProvider>
       </body>

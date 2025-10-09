@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Navbar from '@/components/Navbar'
+import BackButton from '@/components/BackButton'
 import VoiceAssistant from '@/components/VoiceAssistant'
 import { useAccessibility } from '@/components/AccessibilityProvider'
 
@@ -70,6 +71,9 @@ export default function LearningHub() {
       <Navbar />
       
       <main className="max-w-6xl mx-auto px-4 py-8" role="main">
+        <div className="mb-6">
+          <BackButton />
+        </div>
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
             Learning Hub

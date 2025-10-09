@@ -67,6 +67,7 @@ export default function Dashboard() {
             {/* Quick Actions */}
             <div className="bg-white rounded-lg shadow-md p-6">
               <h2 className="text-2xl font-semibold mb-6">🚀 Quick Actions</h2>
+              <p className="text-gray-600 mb-4">Use the sidebar menu (☰) or voice commands to navigate quickly!</p>
               <div className="grid md:grid-cols-3 gap-4">
                 {quickActions.map((action, index) => (
                   <Link

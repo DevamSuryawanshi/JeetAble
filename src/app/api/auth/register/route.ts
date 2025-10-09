@@ -14,9 +14,26 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(email)) {
+      return NextResponse.json(
+        { message: 'Please enter a valid email address' },
+        { status: 400 }
+      )
+    }
+
+    // Validate password length
+    if (password.length < 8) {
+      return NextResponse.json(
+        { message: 'Password must be at least 8 characters long' },
+        { status: 400 }
+      )
+    }
+
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
-      where: { email }
+      where: { email: email.toLowerCase() }
     })
 
     if (existingUser) {
@@ -32,10 +49,10 @@ export async function POST(request: NextRequest) {
     // Create user
     const user = await prisma.user.create({
       data: {
-        name,
-        email,
+        name: name.trim(),
+        email: email.toLowerCase(),
         password: hashedPassword,
-        accessibilityNeeds: accessibilityNeeds || []
+        accessibilityNeeds: JSON.stringify(accessibilityNeeds || [])
       }
     })
 
@@ -45,14 +62,17 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       { 
         message: 'User created successfully',
-        user: userWithoutPassword
+        user: {
+          ...userWithoutPassword,
+          accessibilityNeeds: JSON.parse(userWithoutPassword.accessibilityNeeds)
+        }
       },
       { status: 201 }
     )
   } catch (error) {
     console.error('Registration error:', error)
     return NextResponse.json(
-      { message: 'Internal server error' },
+      { message: 'Internal server error. Please try again.' },
       { status: 500 }
     )
   }

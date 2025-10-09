@@ -99,11 +99,21 @@ function processHumanLikeIntent(message: string, context: any, pageContext: any)
       lowerMessage.includes('take me') || lowerMessage.includes('show me') || lowerMessage.includes('visit')) {
     
     if (lowerMessage.includes('learning') || lowerMessage.includes('learn') || lowerMessage.includes('study') || 
-        lowerMessage.includes('education') || lowerMessage.includes('tutorial')) {
+        lowerMessage.includes('education') || lowerMessage.includes('tutorial') || lowerMessage.includes('hub')) {
       return {
         message: 'I\'ll take you to the Learning Hub where you can access educational resources, tutorials, and interactive learning tools.',
         action: 'navigate',
         target: '/learning',
+        sessionId: context.sessionId
+      }
+    }
+    
+    if (lowerMessage.includes('voice') || lowerMessage.includes('assistant') || lowerMessage.includes('speak') ||
+        lowerMessage.includes('talk') || lowerMessage.includes('voice control')) {
+      return {
+        message: 'Opening the Voice Assistant page where you can test voice commands and control the website with your voice.',
+        action: 'navigate',
+        target: '/voice',
         sessionId: context.sessionId
       }
     }
@@ -285,10 +295,31 @@ function processHumanLikeIntent(message: string, context: any, pageContext: any)
     }
   }
   
+  // Sidebar navigation commands
+  if (lowerMessage.includes('sidebar') || lowerMessage.includes('menu') || lowerMessage.includes('navigation')) {
+    return {
+      message: 'You can access the sidebar navigation by clicking the menu button in the top-left corner. The sidebar includes Voice Assistant, Deaf Mode, Learning Hub, Job Portal, and Emergency Help. Which feature would you like me to open for you?',
+      action: 'clarify',
+      sessionId: context.sessionId
+    }
+  }
+  
+  // Activate/Enable commands for accessibility features
+  if (lowerMessage.includes('activate') || lowerMessage.includes('enable') || lowerMessage.includes('turn on')) {
+    if (lowerMessage.includes('deaf')) {
+      return {
+        message: 'Activating Deaf Mode for you. This will take you to the speech-to-text and visual notification features.',
+        action: 'navigate',
+        target: '/deaf-mode',
+        sessionId: context.sessionId
+      }
+    }
+  }
+  
   // Help and information requests
   if (lowerMessage.includes('what can you do') || lowerMessage.includes('help me') || lowerMessage.includes('capabilities')) {
     return {
-      message: 'I\'m your intelligent assistant! I can navigate pages, fill forms, search content, apply filters, click buttons, scroll pages, play media, and perform almost any action you need on this website. I understand natural language in multiple languages including English, Hindi, Marathi, Rajasthani, and Tamil. Just tell me what you want to do in your own words!',
+      message: 'I\'m your intelligent assistant! I can navigate pages (Learning Hub, Job Portal, Voice Assistant, Deaf Mode, Emergency Help), fill forms, search content, apply filters, click buttons, scroll pages, play media, and perform almost any action you need on this website. I understand natural language in multiple languages including English, Hindi, Marathi, Rajasthani, and Tamil. Just tell me what you want to do in your own words!',
       action: 'clarify',
       sessionId: context.sessionId
     }
