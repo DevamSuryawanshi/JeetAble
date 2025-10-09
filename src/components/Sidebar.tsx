@@ -16,12 +16,20 @@ interface SidebarItem {
 
 const SIDEBAR_ITEMS: SidebarItem[] = [
   {
-    id: 'voice-assistant',
-    title: 'Voice Assistant',
-    icon: '🎙️',
-    href: '/voice',
+    id: 'daily-news',
+    title: 'Daily News',
+    icon: '🗞️',
+    href: '/news',
     color: 'bg-blue-500 hover:bg-blue-600',
-    keywords: ['voice', 'assistant', 'speak', 'talk', 'आवाज', 'बोलना', 'आवाज सहायक', 'குரல்', 'பேசு']
+    keywords: ['news', 'headlines', 'current', 'समाचार', 'खबर', 'செய்தி', 'वार्ता']
+  },
+  {
+    id: 'government-schemes',
+    title: 'Government Schemes',
+    icon: '🏛️',
+    href: '/schemes',
+    color: 'bg-indigo-500 hover:bg-indigo-600',
+    keywords: ['government', 'schemes', 'योजना', 'सरकार', 'அரசு', 'திட்டம்', 'सरकारी योजना']
   },
   {
     id: 'deaf-mode',

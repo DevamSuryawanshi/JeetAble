@@ -60,12 +60,12 @@ export default function Dashboard() {
   }, [speak])
 
   const quickActions = [
-    { title: 'Voice Assistant', icon: '🎤', href: '/voice', color: 'bg-blue-500' },
+    { title: 'Daily News', icon: '🗞️', href: '/news', color: 'bg-blue-500' },
+    { title: 'Government Schemes', icon: '🏛️', href: '/schemes', color: 'bg-indigo-500' },
     { title: 'Deaf Mode', icon: '👂', href: '/deaf-mode', color: 'bg-green-500' },
     { title: 'Learning Hub', icon: '📚', href: '/learning', color: 'bg-purple-500' },
     { title: 'Job Search', icon: '💼', href: '/jobs', color: 'bg-orange-500' },
-    { title: 'Emergency Help', icon: '🚨', href: '/help', color: 'bg-red-500' },
-    { title: 'Settings', icon: '⚙️', href: '/settings', color: 'bg-gray-500' }
+    { title: 'Emergency Help', icon: '🚨', href: '/help', color: 'bg-red-500' }
   ]
 
   const recentActivity = [

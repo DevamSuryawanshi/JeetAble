@@ -108,12 +108,22 @@ function processHumanLikeIntent(message: string, context: any, pageContext: any)
       }
     }
     
-    if (lowerMessage.includes('voice') || lowerMessage.includes('assistant') || lowerMessage.includes('speak') ||
-        lowerMessage.includes('talk') || lowerMessage.includes('voice control')) {
+    if (lowerMessage.includes('news') || lowerMessage.includes('headlines') || lowerMessage.includes('current') ||
+        lowerMessage.includes('समाचार') || lowerMessage.includes('खबर') || lowerMessage.includes('செய்தி')) {
       return {
-        message: 'Opening the Voice Assistant page where you can test voice commands and control the website with your voice.',
+        message: 'Opening the Daily News section where you can read latest headlines from trusted Indian news sources.',
         action: 'navigate',
-        target: '/voice',
+        target: '/news',
+        sessionId: context.sessionId
+      }
+    }
+    
+    if (lowerMessage.includes('government') || lowerMessage.includes('schemes') || lowerMessage.includes('योजना') ||
+        lowerMessage.includes('सरकार') || lowerMessage.includes('அரசு') || lowerMessage.includes('திட்டம்')) {
+      return {
+        message: 'Opening the Government Schemes section where you can explore latest government initiatives and programs.',
+        action: 'navigate',
+        target: '/schemes',
         sessionId: context.sessionId
       }
     }
@@ -319,7 +329,7 @@ function processHumanLikeIntent(message: string, context: any, pageContext: any)
   // Help and information requests
   if (lowerMessage.includes('what can you do') || lowerMessage.includes('help me') || lowerMessage.includes('capabilities')) {
     return {
-      message: 'I\'m your intelligent assistant! I can navigate pages (Learning Hub, Job Portal, Voice Assistant, Deaf Mode, Emergency Help), fill forms, search content, apply filters, click buttons, scroll pages, play media, and perform almost any action you need on this website. I understand natural language in multiple languages including English, Hindi, Marathi, Rajasthani, and Tamil. Just tell me what you want to do in your own words!',
+      message: 'I\'m your intelligent assistant! I can navigate pages (Daily News, Government Schemes, Learning Hub, Job Portal, Deaf Mode, Emergency Help), fill forms, search content, apply filters, click buttons, scroll pages, play media, and perform almost any action you need on this website. I understand natural language in multiple languages including English, Hindi, Marathi, Rajasthani, and Tamil. Just tell me what you want to do in your own words!',
       action: 'clarify',
       sessionId: context.sessionId
     }

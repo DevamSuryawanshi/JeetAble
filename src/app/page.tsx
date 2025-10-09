@@ -15,11 +15,18 @@ export default function Home() {
 
   const features = [
     {
-      title: 'Voice Assistant',
-      description: 'Navigate with voice commands and hear content read aloud',
-      icon: '🎤',
-      href: '/voice',
+      title: 'Daily News',
+      description: 'Latest headlines from trusted Indian news sources',
+      icon: '🗞️',
+      href: '/news',
       color: 'bg-blue-500'
+    },
+    {
+      title: 'Government Schemes',
+      description: 'Explore latest government initiatives and programs',
+      icon: '🏛️',
+      href: '/schemes',
+      color: 'bg-indigo-500'
     },
     {
       title: 'Deaf Mode',
