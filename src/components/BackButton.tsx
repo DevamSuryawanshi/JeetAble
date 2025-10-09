@@ -10,15 +10,15 @@ interface BackButtonProps {
 }
 
 export default function BackButton({ 
-  href = '/dashboard', 
-  label = 'Back to Dashboard',
+  href = '/', 
+  label = 'Back to Home',
   className = ''
 }: BackButtonProps) {
   const router = useRouter()
   const { speak } = useAccessibility()
 
   const handleBack = () => {
-    speak(`Going back to dashboard`)
+    speak(`Going back to home page`)
     router.push(href)
   }
 

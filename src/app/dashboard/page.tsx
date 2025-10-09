@@ -8,11 +8,51 @@ import { useAccessibility } from '@/components/AccessibilityProvider'
 
 export default function Dashboard() {
   const [user, setUser] = useState({
-    name: 'John Doe',
-    email: 'john@example.com',
-    accessibilityNeeds: ['Visual impairment', 'Voice navigation'],
-    joinDate: '2024-01-15'
+    name: 'Guest User',
+    email: 'Not logged in',
+    accessibilityNeeds: ['Please log in to see your preferences'],
+    joinDate: new Date().toISOString().split('T')[0],
+    isLoggedIn: false
   })
+
+  useEffect(() => {
+    // Check if user is logged in (you can replace this with actual auth logic)
+    const checkLoginStatus = () => {
+      const token = localStorage.getItem('authToken')
+      const userData = localStorage.getItem('userData')
+      
+      if (token && userData) {
+        try {
+          const parsedUser = JSON.parse(userData)
+          let accessibilityNeeds = ['No preferences set']
+          
+          if (parsedUser.accessibilityNeeds) {
+            if (typeof parsedUser.accessibilityNeeds === 'string') {
+              try {
+                accessibilityNeeds = JSON.parse(parsedUser.accessibilityNeeds)
+              } catch {
+                accessibilityNeeds = [parsedUser.accessibilityNeeds]
+              }
+            } else if (Array.isArray(parsedUser.accessibilityNeeds)) {
+              accessibilityNeeds = parsedUser.accessibilityNeeds
+            }
+          }
+          
+          setUser({
+            name: parsedUser.name || 'User',
+            email: parsedUser.email || 'user@example.com',
+            accessibilityNeeds: accessibilityNeeds,
+            joinDate: parsedUser.createdAt?.split('T')[0] || new Date().toISOString().split('T')[0],
+            isLoggedIn: true
+          })
+        } catch (error) {
+          console.error('Error parsing user data:', error)
+        }
+      }
+    }
+    
+    checkLoginStatus()
+  }, [])
   const { settings, speak } = useAccessibility()
 
   useEffect(() => {
@@ -118,29 +158,78 @@ export default function Dashboard() {
 
           {/* Sidebar */}
           <div className="space-y-6">
-            {/* Profile Card */}
+            {/* Login Information Card */}
             <div className="bg-white rounded-lg shadow-md p-6">
-              <h2 className="text-xl font-semibold mb-4">👤 Profile</h2>
-              <div className="space-y-3">
-                <div>
-                  <label className="text-sm font-medium text-gray-500">Name</label>
-                  <p className="text-gray-900">{user.name}</p>
+              <h2 className="text-xl font-semibold mb-4">👤 Login Information</h2>
+              {user.isLoggedIn ? (
+                <div className="space-y-3">
+                  <div>
+                    <label className="text-sm font-medium text-gray-500">Name</label>
+                    <p className="text-gray-900">{user.name}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-gray-500">Email</label>
+                    <p className="text-gray-900">{user.email}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-gray-500">Member Since</label>
+                    <p className="text-gray-900">{new Date(user.joinDate).toLocaleDateString()}</p>
+                  </div>
+                  <div className="flex items-center space-x-2 mt-4">
+                    <span className="w-3 h-3 bg-green-500 rounded-full"></span>
+                    <span className="text-sm text-green-600 font-medium">Logged In</span>
+                  </div>
                 </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-500">Email</label>
-                  <p className="text-gray-900">{user.email}</p>
+              ) : (
+                <div className="text-center py-4">
+                  <div className="flex items-center justify-center space-x-2 mb-4">
+                    <span className="w-3 h-3 bg-red-500 rounded-full"></span>
+                    <span className="text-sm text-red-600 font-medium">Not Logged In</span>
+                  </div>
+                  <p className="text-gray-600 mb-4">Please log in to access personalized features</p>
+                  <div className="space-y-2">
+                    <Link
+                      href="/auth/login"
+                      className="w-full bg-primary-500 text-white py-2 px-4 rounded-lg hover:bg-primary-600 focus:outline-none focus-visible transition-colors text-center block"
+                    >
+                      Log In
+                    </Link>
+                    <Link
+                      href="/auth/signup"
+                      className="w-full bg-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-300 focus:outline-none focus-visible transition-colors text-center block"
+                    >
+                      Sign Up
+                    </Link>
+                  </div>
                 </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-500">Member Since</label>
-                  <p className="text-gray-900">{new Date(user.joinDate).toLocaleDateString()}</p>
+              )}
+              {user.isLoggedIn && (
+                <div className="mt-4 space-y-2">
+                  <Link
+                    href="/profile"
+                    className="w-full bg-primary-500 text-white py-2 px-4 rounded-lg hover:bg-primary-600 focus:outline-none focus-visible transition-colors text-center block"
+                  >
+                    Edit Profile
+                  </Link>
+                  <button
+                    onClick={() => {
+                      localStorage.removeItem('authToken')
+                      localStorage.removeItem('userData')
+                      setUser({
+                        name: 'Guest User',
+                        email: 'Not logged in',
+                        accessibilityNeeds: ['Please log in to see your preferences'],
+                        joinDate: new Date().toISOString().split('T')[0],
+                        isLoggedIn: false
+                      })
+                      speak('You have been logged out')
+                    }}
+                    className="w-full bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600 focus:outline-none focus-visible transition-colors text-center"
+                  >
+                    Log Out
+                  </button>
                 </div>
-              </div>
-              <Link
-                href="/profile"
-                className="mt-4 w-full bg-primary-500 text-white py-2 px-4 rounded-lg hover:bg-primary-600 focus:outline-none focus-visible transition-colors text-center block"
-              >
-                Edit Profile
-              </Link>
+              )}
             </div>
 
             {/* Accessibility Settings */}
@@ -174,25 +263,43 @@ export default function Dashboard() {
               </div>
             </div>
 
-            {/* Accessibility Needs */}
+            {/* Accessibility Preferences */}
             <div className="bg-blue-50 rounded-lg p-6">
-              <h2 className="text-xl font-semibold mb-4 text-blue-900">🎯 Your Needs</h2>
-              <div className="space-y-2">
-                {user.accessibilityNeeds.map((need, index) => (
-                  <span
-                    key={index}
-                    className="inline-block bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm mr-2 mb-2"
+              <h2 className="text-xl font-semibold mb-4 text-blue-900">🎯 Accessibility Preferences</h2>
+              {user.isLoggedIn ? (
+                <div>
+                  <div className="space-y-2 mb-4">
+                    {Array.isArray(user.accessibilityNeeds) && user.accessibilityNeeds.length > 0 ? user.accessibilityNeeds.map((need, index) => (
+                      <span
+                        key={index}
+                        className="inline-block bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm mr-2 mb-2"
+                      >
+                        {need}
+                      </span>
+                    )) : (
+                      <span className="inline-block bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm mr-2 mb-2">
+                        No preferences set
+                      </span>
+                    )}
+                  </div>
+                  <Link
+                    href="/settings"
+                    className="text-blue-600 hover:text-blue-800 text-sm font-medium focus:outline-none focus-visible"
                   >
-                    {need}
-                  </span>
-                ))}
-              </div>
-              <Link
-                href="/settings"
-                className="mt-4 text-blue-600 hover:text-blue-800 text-sm font-medium focus:outline-none focus-visible"
-              >
-                Update preferences →
-              </Link>
+                    Update preferences →
+                  </Link>
+                </div>
+              ) : (
+                <div className="text-center py-4">
+                  <p className="text-blue-700 mb-3">Log in to set your accessibility preferences</p>
+                  <Link
+                    href="/auth/login"
+                    className="text-blue-600 hover:text-blue-800 text-sm font-medium focus:outline-none focus-visible"
+                  >
+                    Log in to customize →
+                  </Link>
+                </div>
+              )}
             </div>
 
             {/* Support */}

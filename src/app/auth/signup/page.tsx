@@ -52,6 +52,11 @@ export default function Signup() {
       const data = await response.json()
 
       if (response.ok) {
+        // Store user data after successful registration
+        if (data.user) {
+          localStorage.setItem('userData', JSON.stringify(data.user))
+          localStorage.setItem('authToken', 'temp-token-' + Date.now()) // Temporary token
+        }
         speak('Account created successfully. Redirecting to dashboard.')
         router.push('/dashboard')
       } else {

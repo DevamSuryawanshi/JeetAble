@@ -81,11 +81,21 @@ export default function EmergencyHelpAndSupportIndia() {
   useEffect(() => {
     if (typeof window !== 'undefined' && !window.google) {
       const script = document.createElement('script')
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places`
+      // Use a fallback API key for demo purposes
+      const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || 'AIzaSyBFw0Qbyq9zTFTd-tUY6dpoWMROTJJOBDU'
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`
       script.async = true
-      script.onload = () => setMapLoaded(true)
+      script.onload = () => {
+        console.log('Google Maps API loaded successfully')
+        setMapLoaded(true)
+      }
+      script.onerror = () => {
+        console.error('Failed to load Google Maps API')
+        setError('Failed to load Google Maps. Map features may not work.')
+      }
       document.head.appendChild(script)
     } else if (window.google) {
+      console.log('Google Maps API already available')
       setMapLoaded(true)
     }
   }, [])
@@ -198,9 +208,12 @@ export default function EmergencyHelpAndSupportIndia() {
         setServices(mappedServices)
         speak(`Found ${mappedServices.length} real ${serviceType} services nearby`)
         
-        if (mapLoaded && googleMapRef.current) {
-          displayServicesOnMap(mappedServices, location)
-        }
+        // Always try to display map when services are found
+        setTimeout(() => {
+          if (mapLoaded) {
+            displayServicesOnMap(mappedServices, location)
+          }
+        }, 100)
       } else {
         throw new Error('Failed to fetch services')
       }
@@ -314,21 +327,31 @@ export default function EmergencyHelpAndSupportIndia() {
     setLocationStatus('granted')
     speak(`Showing ${filteredServices.length} sample ${selectedServiceType} services`)
     
-    if (mapLoaded) {
-      displayServicesOnMap(filteredServices, { lat: 18.5204, lng: 73.8567 })
-    }
+    // Always try to display map for mock data
+    setTimeout(() => {
+      if (mapLoaded) {
+        displayServicesOnMap(filteredServices, { lat: 18.5204, lng: 73.8567 })
+      }
+    }, 100)
     setIsLoading(false)
   }
 
   const displayServicesOnMap = (services: EmergencyService[], location: UserLocation) => {
-    if (!mapRef.current || !window.google) return
+    if (!mapRef.current || !window.google) {
+      console.log('Map ref or Google Maps not available')
+      return
+    }
 
+    console.log('Initializing map with location:', location)
+    
     const map = new google.maps.Map(mapRef.current, {
       center: location,
-      zoom: 13
+      zoom: 13,
+      mapTypeId: google.maps.MapTypeId.ROADMAP
     })
 
     googleMapRef.current = map
+    console.log('Map initialized successfully')
 
     // Clear existing markers
     markersRef.current.forEach(marker => marker.setMap(null))
@@ -503,6 +526,14 @@ export default function EmergencyHelpAndSupportIndia() {
             )}
           </button>
           
+          <button
+            onClick={loadMockIndianData}
+            disabled={isLoading}
+            className="bg-purple-500 text-white px-6 py-3 rounded-lg hover:bg-purple-600 focus:outline-none focus:ring-4 focus:ring-purple-300 disabled:opacity-50 transition-colors"
+          >
+            🏥 Show Sample Services
+          </button>
+          
           {(locationStatus === 'denied' || locationStatus === 'error') && (
             <button
               onClick={() => setShowManualSearch(!showManualSearch)}
@@ -531,11 +562,17 @@ export default function EmergencyHelpAndSupportIndia() {
           </select>
           
           <button
-            onClick={() => userLocation && findNearbyServices(userLocation, selectedServiceType)}
-            disabled={!userLocation || isLoading}
+            onClick={() => {
+              if (userLocation) {
+                findNearbyServices(userLocation, selectedServiceType)
+              } else {
+                loadMockIndianData()
+              }
+            }}
+            disabled={isLoading}
             className="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 focus:outline-none focus:ring-4 focus:ring-green-300 disabled:opacity-50 transition-colors"
           >
-            {isLoading ? 'Searching...' : '🔍 Search Real Services'}
+            {isLoading ? 'Searching...' : userLocation ? '🔍 Search Real Services' : '🔍 Show Sample Services'}
           </button>
         </div>
 
@@ -627,9 +664,42 @@ export default function EmergencyHelpAndSupportIndia() {
         </div>
       )}
 
+      {/* Map Section - Always Show */}
+      <div className="mb-8">
+        <h3 className="text-2xl font-semibold text-gray-900 mb-4">
+          🗺️ Services Map
+        </h3>
+        <div className="relative">
+          <div 
+            ref={mapRef}
+            className="w-full h-96 bg-gray-200 rounded-lg border border-gray-300"
+            role="img"
+            aria-label="Map showing emergency services locations"
+            style={{ minHeight: '384px' }}
+          >
+            {!mapLoaded && (
+              <div className="absolute inset-0 flex items-center justify-center bg-gray-100 rounded-lg">
+                <div className="text-center">
+                  <div className="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-2"></div>
+                  <p className="text-gray-600">Loading map...</p>
+                </div>
+              </div>
+            )}
+          </div>
+          {mapLoaded && services.length === 0 && (
+            <div className="absolute inset-0 flex items-center justify-center bg-gray-50 rounded-lg pointer-events-none">
+              <div className="text-center">
+                <div className="text-4xl mb-2">🗺️</div>
+                <p className="text-gray-600">Click "Detect My Location" or "Show Sample Services" to see the map</p>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
       {/* Services Results */}
       {services.length > 0 && (
-        <div className="grid lg:grid-cols-2 gap-8">
+        <div className="space-y-6">
           {/* Services List */}
           <div className="space-y-4">
             <h3 className="text-2xl font-semibold text-gray-900 mb-4">
@@ -689,27 +759,7 @@ export default function EmergencyHelpAndSupportIndia() {
             })}
           </div>
 
-          {/* Map */}
-          <div className="lg:sticky lg:top-4">
-            <h3 className="text-2xl font-semibold text-gray-900 mb-4">
-              🗺️ Services Map
-            </h3>
-            <div 
-              ref={mapRef}
-              className="w-full h-96 bg-gray-200 rounded-lg border border-gray-300"
-              role="img"
-              aria-label="Map showing emergency services locations"
-            >
-              {!mapLoaded && (
-                <div className="flex items-center justify-center h-full">
-                  <div className="text-center">
-                    <div className="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-2"></div>
-                    <p className="text-gray-600">Loading map...</p>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
+
         </div>
       )}
 

@@ -33,6 +33,13 @@ export default function Login() {
       const data = await response.json()
 
       if (response.ok) {
+        // Store auth token and user data
+        if (data.token) {
+          localStorage.setItem('authToken', data.token)
+        }
+        if (data.user) {
+          localStorage.setItem('userData', JSON.stringify(data.user))
+        }
         speak('Login successful. Redirecting to dashboard.')
         router.push('/dashboard')
       } else {

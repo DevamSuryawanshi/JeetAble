@@ -107,23 +107,16 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Stats Section */}
-        <section className="py-16 bg-primary-500 text-white" aria-labelledby="stats-title">
+        {/* College Logo Section */}
+        <section className="py-16 bg-white" aria-labelledby="college-section">
           <div className="max-w-4xl mx-auto px-4 text-center">
-            <h2 id="stats-title" className="text-3xl font-bold mb-12">Making a Difference</h2>
-            <div className="grid md:grid-cols-3 gap-8">
-              <div>
-                <div className="text-4xl font-bold mb-2">1M+</div>
-                <div className="text-xl">Users Empowered</div>
-              </div>
-              <div>
-                <div className="text-4xl font-bold mb-2">50+</div>
-                <div className="text-xl">Accessibility Features</div>
-              </div>
-              <div>
-                <div className="text-4xl font-bold mb-2">24/7</div>
-                <div className="text-xl">Support Available</div>
-              </div>
+            <h2 id="college-section" className="text-3xl font-bold mb-8 text-gray-900">Developed at</h2>
+            <div className="flex justify-center">
+              <img 
+                src="/mitaoelogo.png" 
+                alt="MIT Academy of Engineering - An Autonomous Institute Affiliated to Savitribai Phule Pune University"
+                className="max-w-md w-full h-auto"
+              />
             </div>
           </div>
         </section>
