@@ -173,7 +173,7 @@ export default function GovernmentSchemes() {
                   </div>
                   
                   <p className="text-gray-700 text-lg leading-relaxed mb-6">
-                    {scheme.description}
+                    {scheme.description.replace(/&#39;/g, "'").replace(/&quot;/g, '"').replace(/&amp;/g, '&')}
                   </p>
                   
                   <div className="flex flex-wrap gap-3">

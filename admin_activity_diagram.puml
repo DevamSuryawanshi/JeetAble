@@ -1,0 +1,39 @@
+@startuml Admin_Activity_Diagram
+
+start
+
+:Login;
+
+:Dashboard;
+
+repeat
+  
+  switch (Admin Choice)
+  case (Emergency Help)
+    :Emergency Help;
+    :Edit Contact Information;
+    :back to Dashboard;
+  case (Learning Hub)
+    :Learning Hub;
+    :Add / Remove Study Material;
+    :back to Dashboard;
+  case (Government Schemes)
+    :Government Schemes;
+    :Add / Remove Schemes;
+    :back to Dashboard;
+  case (Job Portal)
+    :Job Portal;
+    :Add / Remove Available Jobs;
+    :back to Dashboard;
+  case (Logout)
+    if (Logout?) then (Yes)
+      :Close;
+      stop
+    else (No)
+      :Go back to Dashboard;
+    endif
+  endswitch
+
+repeat while (Continue?) is (Yes)
+
+@enduml

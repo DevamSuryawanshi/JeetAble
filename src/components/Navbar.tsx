@@ -41,6 +41,14 @@ export default function Navbar() {
             </button>
             
             <Link
+              href="/admin/login"
+              className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 focus:outline-none focus-visible transition-colors"
+              onClick={() => handleNavClick('admin')}
+            >
+              Admin
+            </Link>
+            
+            <Link
               href="/auth/login"
               className="text-gray-700 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium focus:outline-none focus-visible"
               onClick={() => handleNavClick('login')}
