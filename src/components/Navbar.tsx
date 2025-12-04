@@ -40,13 +40,26 @@ export default function Navbar() {
               ⚙️ Settings
             </button>
             
-            <Link
-              href="/admin/login"
+            <button
+              onClick={async () => {
+                try {
+                  const response = await fetch('/api/admin/check');
+                  const data = await response.json();
+                  
+                  if (data.hasAdmin) {
+                    window.location.href = '/admin/login';
+                  } else {
+                    window.location.href = '/admin/signup';
+                  }
+                  handleNavClick('admin');
+                } catch (error) {
+                  window.location.href = '/admin/signup';
+                }
+              }}
               className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 focus:outline-none focus-visible transition-colors"
-              onClick={() => handleNavClick('admin')}
             >
               Admin
-            </Link>
+            </button>
             
             <Link
               href="/auth/login"

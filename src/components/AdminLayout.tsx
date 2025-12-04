@@ -13,9 +13,17 @@ export default function AdminLayout({ children, title }: AdminLayoutProps) {
   const router = useRouter();
   const [showLogout, setShowLogout] = useState(false);
 
-  const handleLogout = (confirm: boolean) => {
+  const handleLogout = async (confirm: boolean) => {
     if (confirm) {
-      router.push('/');
+      try {
+        await fetch('/api/admin/logout', { method: 'POST' });
+        localStorage.removeItem('adminData');
+        window.location.href = '/';
+      } catch (error) {
+        console.error('Logout error:', error);
+        localStorage.removeItem('adminData');
+        window.location.href = '/';
+      }
     } else {
       setShowLogout(false);
     }

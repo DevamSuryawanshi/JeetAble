@@ -10,7 +10,7 @@ export async function POST(request: NextRequest) {
     const db = client.db('jeetable');
     const collection = db.collection('governmentSchemes');
     
-    const newScheme: Omit<GovernmentScheme, '_id'> = {
+    const newScheme = {
       schemeName,
       description,
       eligibility,

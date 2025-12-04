@@ -28,12 +28,18 @@ export default function DailyNews() {
   const fetchNews = async () => {
     try {
       setIsLoading(true)
-      const response = await fetch('/api/news')
+      const response = await fetch('/api/news-api')
       const data = await response.json()
       
       if (data.success) {
-        setNews(data.data)
-        setLastUpdated(data.lastUpdated)
+        setNews(data.data.map((item: any) => ({
+          title: item.title,
+          description: item.description,
+          link: item.link,
+          pubDate: item.createdAt,
+          source: 'Admin News'
+        })))
+        setLastUpdated(new Date().toISOString())
         speak(`Loaded ${data.data.length} news headlines`)
       } else {
         setError('Failed to load news')

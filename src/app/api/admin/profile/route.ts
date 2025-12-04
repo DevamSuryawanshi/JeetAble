@@ -1,26 +1,33 @@
 import { NextRequest, NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongodb';
+import jwt from 'jsonwebtoken';
 
 export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url);
-    const adminId = searchParams.get('adminId');
+    // Get token from cookies
+    const token = request.cookies.get('adminToken')?.value;
     
-    if (!adminId) {
-      return NextResponse.json({ error: 'Admin ID required' }, { status: 400 });
+    if (!token) {
+      return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
     }
+
+    // Verify JWT token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
     
     const client = await clientPromise;
     const db = client.db('jeetable');
-    const collection = db.collection('adminProfile');
+    const collection = db.collection('admins');
     
-    const admin = await collection.findOne({ adminId });
+    const { ObjectId } = require('mongodb');
+    const admin = await collection.findOne({ _id: new ObjectId(decoded.adminId) });
     
     if (!admin) {
       return NextResponse.json({ error: 'Admin not found' }, { status: 404 });
     }
     
-    return NextResponse.json({ success: true, admin });
+    // Return admin data without password
+    const { password, ...adminData } = admin;
+    return NextResponse.json({ success: true, admin: adminData });
     
   } catch (error) {
     console.error('Get admin profile error:', error);
@@ -30,21 +37,28 @@ export async function GET(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const { adminId, name, email, phone, department, role } = await request.json();
+    // Get token from cookies
+    const token = request.cookies.get('adminToken')?.value;
+    
+    if (!token) {
+      return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
+    }
+
+    // Verify JWT token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
+    const { name, phone } = await request.json();
     
     const client = await clientPromise;
     const db = client.db('jeetable');
-    const collection = db.collection('adminProfile');
+    const collection = db.collection('admins');
     
+    const { ObjectId } = require('mongodb');
     const result = await collection.updateOne(
-      { adminId },
+      { _id: new ObjectId(decoded.adminId) },
       {
         $set: {
           name,
-          email,
           phone,
-          department,
-          role,
           updatedAt: new Date()
         }
       }

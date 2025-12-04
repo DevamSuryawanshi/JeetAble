@@ -267,73 +267,67 @@ export default function EmergencyHelpAndSupportIndia() {
     }
   }
 
-  const loadMockIndianData = () => {
-    const mockServices: EmergencyService[] = [
-      {
-        id: '1',
-        name: 'Ruby Hall Clinic',
-        type: 'hospital',
-        distance: '1.0 km',
-        address: 'Sassoon Road, Pune, Maharashtra',
-        lat: 18.5283,
-        lng: 73.8795,
-        phone: '+91-20-6645-8888'
-      },
-      {
-        id: '2',
-        name: 'KEM Hospital',
-        type: 'hospital',
-        distance: '1.5 km',
-        address: 'Rasta Peth, Pune, Maharashtra',
-        lat: 18.5089,
-        lng: 73.8553,
-        phone: '+91-20-2612-9801'
-      },
-      {
-        id: '3',
-        name: 'Bund Garden Police Station',
-        type: 'police',
-        distance: '0.9 km',
-        address: 'Bund Garden Road, Pune, Maharashtra',
-        lat: 18.5304,
-        lng: 73.8776,
-        phone: '+91-20-2613-2978'
-      },
-      {
-        id: '4',
-        name: 'Pune Fire Station',
-        type: 'fire',
-        distance: '1.2 km',
-        address: 'Shivajinagar, Pune, Maharashtra',
-        lat: 18.5314,
-        lng: 73.8446,
-        phone: '+91-20-2553-2888'
-      },
-      {
-        id: '5',
-        name: 'Sahyadri Hospital',
-        type: 'clinic',
-        distance: '2.1 km',
-        address: 'Karve Road, Pune, Maharashtra',
-        lat: 18.4948,
-        lng: 73.8174,
-        phone: '+91-20-6799-6999'
+  const loadMockIndianData = async () => {
+    try {
+      // First try to fetch from MongoDB
+      const response = await fetch('/api/emergency-services')
+      const data = await response.json()
+      
+      if (data.success && data.data.length > 0) {
+        const mappedServices = data.data.map((service: any, index: number) => ({
+          id: service._id || index.toString(),
+          name: service.name,
+          type: 'hospital', // Default type
+          distance: '1.0 km', // Default distance
+          address: service.email, // Using email as address for now
+          lat: 18.5204 + (Math.random() - 0.5) * 0.01, // Random nearby coordinates
+          lng: 73.8567 + (Math.random() - 0.5) * 0.01,
+          phone: service.phone
+        }))
+        
+        setServices(mappedServices)
+        setUserLocation({ lat: 18.5204, lng: 73.8567 })
+        setLocationStatus('granted')
+        speak(`Showing ${mappedServices.length} emergency services from database`)
+        
+        setTimeout(() => {
+          if (mapLoaded) {
+            displayServicesOnMap(mappedServices, { lat: 18.5204, lng: 73.8567 })
+          }
+        }, 100)
+      } else {
+        // Fallback to mock data if no database entries
+        const mockServices: EmergencyService[] = [
+          {
+            id: '1',
+            name: 'Ruby Hall Clinic',
+            type: 'hospital',
+            distance: '1.0 km',
+            address: 'Sassoon Road, Pune, Maharashtra',
+            lat: 18.5283,
+            lng: 73.8795,
+            phone: '+91-20-6645-8888'
+          }
+        ]
+        
+        const filteredServices = mockServices.filter(service => service.type === selectedServiceType)
+        setServices(filteredServices)
+        setUserLocation({ lat: 18.5204, lng: 73.8567 })
+        setLocationStatus('granted')
+        speak(`Showing ${filteredServices.length} sample ${selectedServiceType} services`)
+        
+        setTimeout(() => {
+          if (mapLoaded) {
+            displayServicesOnMap(filteredServices, { lat: 18.5204, lng: 73.8567 })
+          }
+        }, 100)
       }
-    ]
-    
-    const filteredServices = mockServices.filter(service => service.type === selectedServiceType)
-    setServices(filteredServices)
-    setUserLocation({ lat: 18.5204, lng: 73.8567 }) // Pune coordinates
-    setLocationStatus('granted')
-    speak(`Showing ${filteredServices.length} sample ${selectedServiceType} services`)
-    
-    // Always try to display map for mock data
-    setTimeout(() => {
-      if (mapLoaded) {
-        displayServicesOnMap(filteredServices, { lat: 18.5204, lng: 73.8567 })
-      }
-    }, 100)
-    setIsLoading(false)
+    } catch (error) {
+      console.error('Error loading emergency services:', error)
+      speak('Unable to load emergency services')
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const displayServicesOnMap = (services: EmergencyService[], location: UserLocation) => {

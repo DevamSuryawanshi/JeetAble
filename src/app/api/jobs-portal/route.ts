@@ -10,7 +10,7 @@ export async function POST(request: NextRequest) {
     const db = client.db('jeetable');
     const collection = db.collection('jobs');
     
-    const newJob: Omit<JobModel, '_id'> = {
+    const newJob = {
       title,
       company,
       location,
