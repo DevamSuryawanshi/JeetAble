@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import AdminSidebar from './AdminSidebar';
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -21,23 +22,28 @@ export default function AdminLayout({ children, title }: AdminLayoutProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <header className="bg-white shadow p-4">
-        <div className="flex justify-between items-center max-w-7xl mx-auto">
-          <h1 className="text-2xl font-bold text-gray-900">{title}</h1>
-          <button
-            onClick={() => setShowLogout(true)}
-            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
-          >
-            Logout
-          </button>
-        </div>
-      </header>
+    <div className="min-h-screen bg-gray-100 flex">
+      {/* Admin Sidebar - NO User Sidebar */}
+      <AdminSidebar />
       
-      <main className="p-8">{children}</main>
+      <div className="flex-1">
+        <header className="bg-white shadow p-4">
+          <div className="flex justify-between items-center">
+            <h1 className="text-2xl font-bold text-gray-900">{title}</h1>
+            <button
+              onClick={() => setShowLogout(true)}
+              className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+            >
+              Logout
+            </button>
+          </div>
+        </header>
+        
+        <main className="p-8">{children}</main>
+      </div>
 
       {showLogout && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded shadow-lg">
             <p className="text-gray-900 mb-4 text-center">Logout?</p>
             <div className="flex gap-4 justify-center">

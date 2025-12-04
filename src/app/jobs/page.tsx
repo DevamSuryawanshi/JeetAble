@@ -1,69 +1,39 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Navbar from '@/components/Navbar'
 import BackButton from '@/components/BackButton'
 import VoiceAssistant from '@/components/VoiceAssistant'
 import { useAccessibility } from '@/components/AccessibilityProvider'
-
-interface Job {
-  id: number
-  title: string
-  company: string
-  location: string
-  type: string
-  accessibility: string[]
-  description: string
-  salary: string
-}
+import { JobModel } from '@/models/JobModel'
 
 export default function JobPortal() {
   const [selectedFilters, setSelectedFilters] = useState<string[]>([])
-  const [selectedJob, setSelectedJob] = useState<Job | null>(null)
+  const [selectedJob, setSelectedJob] = useState<JobModel | null>(null)
+  const [jobs, setJobs] = useState<JobModel[]>([])
+  const [loading, setLoading] = useState(true)
   const { speak } = useAccessibility()
 
-  const jobs: Job[] = [
-    {
-      id: 1,
-      title: 'Frontend Developer',
-      company: 'TechCorp Inc.',
-      location: 'Remote',
-      type: 'Full-time',
-      accessibility: ['Remote Work', 'Flexible Hours', 'Screen Reader Compatible'],
-      description: 'Develop accessible web applications using React and TypeScript.',
-      salary: '$70,000 - $90,000'
-    },
-    {
-      id: 2,
-      title: 'UX Designer',
-      company: 'Design Studio',
-      location: 'New York, NY',
-      type: 'Part-time',
-      accessibility: ['Wheelchair Accessible', 'Flexible Hours', 'Visual Accommodations'],
-      description: 'Create inclusive and accessible user experiences.',
-      salary: '$50,000 - $65,000'
-    },
-    {
-      id: 3,
-      title: 'Customer Support Specialist',
-      company: 'HelpDesk Solutions',
-      location: 'Remote',
-      type: 'Full-time',
-      accessibility: ['Remote Work', 'ASL Interpreter Available', 'Flexible Schedule'],
-      description: 'Provide customer support through multiple accessible channels.',
-      salary: '$40,000 - $55,000'
-    },
-    {
-      id: 4,
-      title: 'Data Analyst',
-      company: 'Analytics Pro',
-      location: 'San Francisco, CA',
-      type: 'Contract',
-      accessibility: ['Wheelchair Accessible', 'Assistive Technology Support'],
-      description: 'Analyze data and create accessible reports and visualizations.',
-      salary: '$60,000 - $75,000'
+  useEffect(() => {
+    fetchJobs()
+  }, [])
+
+  const fetchJobs = async () => {
+    try {
+      setLoading(true)
+      const response = await fetch('/api/jobs-portal')
+      const data = await response.json()
+      
+      if (data.success) {
+        setJobs(data.data)
+        speak(`Found ${data.data.length} accessible job opportunities`)
+      }
+    } catch (error) {
+      console.error('Error fetching jobs:', error)
+    } finally {
+      setLoading(false)
     }
-  ]
+  }
 
   const filters = [
     'Remote Work',
@@ -85,10 +55,10 @@ export default function JobPortal() {
 
   const filteredJobs = jobs.filter(job => 
     selectedFilters.length === 0 || 
-    selectedFilters.some(filter => job.accessibility.includes(filter))
+    selectedFilters.some(filter => job.description.toLowerCase().includes(filter.toLowerCase()))
   )
 
-  const handleJobClick = (job: Job) => {
+  const handleJobClick = (job: JobModel) => {
     setSelectedJob(job)
     speak(`Opening job details for ${job.title} at ${job.company}`)
   }
@@ -174,13 +144,13 @@ export default function JobPortal() {
                       <p className="text-lg text-primary-600">{job.company}</p>
                     </div>
                     <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
-                      {job.type}
+                      Full-time
                     </span>
                   </div>
                   
                   <div className="mb-3">
                     <p className="text-gray-600 mb-2">📍 {job.location}</p>
-                    <p className="text-gray-600 mb-2">💰 {job.salary}</p>
+                    <p className="text-gray-600 mb-2">💰 {job.salaryRange}</p>
                   </div>
 
                   <div className="mb-3">
@@ -188,14 +158,9 @@ export default function JobPortal() {
                   </div>
 
                   <div className="flex flex-wrap gap-2">
-                    {job.accessibility.map((feature, index) => (
-                      <span
-                        key={index}
-                        className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm"
-                      >
-                        ♿ {feature}
-                      </span>
-                    ))}
+                    <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm">
+                      ♿ Accessible Workplace
+                    </span>
                   </div>
                 </div>
               ))}

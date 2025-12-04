@@ -42,14 +42,20 @@ export default function GovernmentSchemes() {
   const fetchSchemes = async (category?: string) => {
     try {
       setIsLoading(true)
-      const categoryParam = category && category !== 'All Categories' ? `?category=${encodeURIComponent(category)}` : ''
-      const response = await fetch(`/api/schemes${categoryParam}`)
+      const response = await fetch('/api/government-schemes')
       const data = await response.json()
       
       if (data.success) {
-        setSchemes(data.data)
-        setLastUpdated(data.lastUpdated)
-        speak(`Loaded ${data.data.length} government schemes`)
+        let filteredSchemes = data.data
+        if (category && category !== 'All Categories') {
+          filteredSchemes = data.data.filter((scheme: any) => 
+            scheme.schemeName.toLowerCase().includes(category.toLowerCase()) ||
+            scheme.description.toLowerCase().includes(category.toLowerCase())
+          )
+        }
+        setSchemes(filteredSchemes)
+        setLastUpdated(new Date().toISOString())
+        speak(`Loaded ${filteredSchemes.length} government schemes`)
       } else {
         setError('Failed to load schemes')
         speak('Failed to load government schemes')
@@ -159,38 +165,42 @@ export default function GovernmentSchemes() {
                   <div className="flex justify-between items-start mb-4">
                     <div className="flex-1">
                       <h2 className="text-2xl font-bold text-gray-900 mb-2 leading-tight">
-                        {scheme.title}
+                        {scheme.schemeName}
                       </h2>
                       <div className="flex flex-wrap items-center gap-2 mb-3">
                         <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
-                          {scheme.category}
+                          Government Scheme
                         </span>
                         <span className="text-gray-500 text-sm">
-                          • {scheme.ministry}
+                          • {new Date(scheme.createdAt).toLocaleDateString()}
                         </span>
                       </div>
                     </div>
                   </div>
                   
-                  <p className="text-gray-700 text-lg leading-relaxed mb-6">
-                    {scheme.description.replace(/&#39;/g, "'").replace(/&quot;/g, '"').replace(/&amp;/g, '&')}
+                  <p className="text-gray-700 text-lg leading-relaxed mb-4">
+                    {scheme.description}
+                  </p>
+                  
+                  <p className="text-gray-600 mb-6">
+                    <strong>Eligibility:</strong> {scheme.eligibility}
                   </p>
                   
                   <div className="flex flex-wrap gap-3">
                     <button
-                      onClick={() => readAloud(scheme.title, scheme.description, scheme.ministry)}
+                      onClick={() => readAloud(scheme.schemeName, scheme.description, 'Government')}
                       className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-300 transition-colors"
-                      aria-label={`Read aloud: ${scheme.title}`}
+                      aria-label={`Read aloud: ${scheme.schemeName}`}
                     >
                       🔊 Read Aloud
                     </button>
                     
                     <button
-                      onClick={() => openScheme(scheme.link, scheme.title)}
+                      onClick={() => openScheme(scheme.applicationLink, scheme.schemeName)}
                       className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 transition-colors"
-                      aria-label={`Visit official website: ${scheme.title}`}
+                      aria-label={`Visit official website: ${scheme.schemeName}`}
                     >
-                      🌐 Visit Official Site
+                      🌐 Apply Now
                     </button>
                   </div>
                 </article>

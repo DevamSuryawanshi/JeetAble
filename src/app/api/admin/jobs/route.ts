@@ -1,30 +1,31 @@
 import { NextRequest, NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongodb';
-import { Scheme } from '@/models/Scheme';
+import { Job } from '@/models/Job';
 
 export async function POST(request: NextRequest) {
   try {
-    const { schemeName, schemeDescription, eligibilityCriteria, applicationLink } = await request.json();
+    const { jobTitle, companyName, location, jobDescription, salaryRange } = await request.json();
     
     const client = await clientPromise;
     const db = client.db('jeetable');
-    const collection = db.collection('schemes');
+    const collection = db.collection('jobs');
     
-    const newScheme: Omit<Scheme, '_id'> = {
-      schemeName,
-      schemeDescription,
-      eligibilityCriteria,
-      applicationLink,
+    const newJob: Omit<Job, '_id'> = {
+      jobTitle,
+      companyName,
+      location,
+      jobDescription,
+      salaryRange,
       createdAt: new Date(),
       updatedAt: new Date()
     };
     
-    const result = await collection.insertOne(newScheme);
+    const result = await collection.insertOne(newJob);
     
     return NextResponse.json({ success: true, id: result.insertedId });
   } catch (error) {
-    console.error('Admin API Error:', error);
-    return NextResponse.json({ error: 'Failed to save scheme' }, { status: 500 });
+    console.error('Admin jobs API error:', error);
+    return NextResponse.json({ error: 'Failed to save job' }, { status: 500 });
   }
 }
 
@@ -32,14 +33,14 @@ export async function GET() {
   try {
     const client = await clientPromise;
     const db = client.db('jeetable');
-    const collection = db.collection('schemes');
+    const collection = db.collection('jobs');
     
-    const schemes = await collection.find({}).toArray();
+    const jobs = await collection.find({}).toArray();
     
-    return NextResponse.json({ success: true, data: schemes });
+    return NextResponse.json({ success: true, data: jobs });
   } catch (error) {
-    console.error('Get schemes error:', error);
-    return NextResponse.json({ error: 'Failed to fetch schemes' }, { status: 500 });
+    console.error('Get jobs error:', error);
+    return NextResponse.json({ error: 'Failed to fetch jobs' }, { status: 500 });
   }
 }
 
@@ -54,14 +55,14 @@ export async function DELETE(request: NextRequest) {
     
     const client = await clientPromise;
     const db = client.db('jeetable');
-    const collection = db.collection('schemes');
+    const collection = db.collection('jobs');
     
     const { ObjectId } = require('mongodb');
     await collection.deleteOne({ _id: new ObjectId(id) });
     
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Delete scheme error:', error);
-    return NextResponse.json({ error: 'Failed to delete scheme' }, { status: 500 });
+    console.error('Delete job error:', error);
+    return NextResponse.json({ error: 'Failed to delete job' }, { status: 500 });
   }
 }

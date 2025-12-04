@@ -75,12 +75,7 @@ export default function Dashboard() {
     { action: 'Updated accessibility preferences', time: '3 days ago', icon: '⚙️' }
   ]
 
-  const accessibilityStats = [
-    { label: 'Voice Commands Used', value: '127', icon: '🎤' },
-    { label: 'Learning Sessions', value: '23', icon: '📚' },
-    { label: 'Jobs Applied', value: '8', icon: '💼' },
-    { label: 'Days Active', value: '45', icon: '📅' }
-  ]
+
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -125,19 +120,7 @@ export default function Dashboard() {
               </div>
             </div>
 
-            {/* Accessibility Stats */}
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <h2 className="text-2xl font-semibold mb-6">📊 Your Activity</h2>
-              <div className="grid md:grid-cols-4 gap-4">
-                {accessibilityStats.map((stat, index) => (
-                  <div key={index} className="text-center p-4 bg-gray-50 rounded-lg">
-                    <div className="text-2xl mb-2">{stat.icon}</div>
-                    <div className="text-2xl font-bold text-primary-600">{stat.value}</div>
-                    <div className="text-sm text-gray-600">{stat.label}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
+
 
             {/* Recent Activity */}
             <div className="bg-white rounded-lg shadow-md p-6">
