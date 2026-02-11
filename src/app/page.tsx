@@ -29,6 +29,16 @@ export default function Home() {
       color: 'bg-indigo-500'
     },
     {
+<<<<<<< HEAD
+=======
+      title: 'Deaf Mode',
+      description: 'Real-time speech-to-text and visual notifications',
+      icon: '👂',
+      href: '/deaf-mode',
+      color: 'bg-green-500'
+    },
+    {
+>>>>>>> 16046fa464964c20bd9bd45317c5538d9e2ffc2a
       title: 'Learning Hub',
       description: 'Accessible learning resources and tools',
       icon: '📚',
@@ -63,16 +73,34 @@ export default function Home() {
               Empowering Digital <span className="text-primary-500">Accessibility</span>
             </h1>
             <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+<<<<<<< HEAD
               A comprehensive platform designed to help blind users learn, communicate, 
               and navigate the digital world with confidence and independence.
             </p>
             <button
               onClick={() => speak('Welcome to JeetAble. This platform provides voice navigation, learning resources, job opportunities, and emergency assistance for blind users.')}
               className="bg-primary-500 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-primary-600 focus:outline-none focus-visible transition-colors"
+=======
+              A comprehensive platform designed to help disabled users learn, communicate, 
+              and navigate the digital world with confidence and independence.
+            </p>
+            <button
+              onClick={() => speak('Welcome to JeetAble. This platform provides voice navigation, deaf mode support, learning resources, job opportunities, and emergency assistance for users with disabilities.')}
+              className="bg-primary-500 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-primary-600 focus:outline-none focus-visible transition-colors mr-4"
+>>>>>>> 16046fa464964c20bd9bd45317c5538d9e2ffc2a
               aria-label="Play welcome message"
             >
               🔊 Play Welcome Message
             </button>
+<<<<<<< HEAD
+=======
+            <Link
+              href="/auth/signup"
+              className="bg-white text-primary-500 border-2 border-primary-500 px-8 py-4 rounded-lg text-lg font-semibold hover:bg-primary-50 focus:outline-none focus-visible transition-colors inline-block"
+            >
+              Get Started
+            </Link>
+>>>>>>> 16046fa464964c20bd9bd45317c5538d9e2ffc2a
           </div>
         </section>
 

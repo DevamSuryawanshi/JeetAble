@@ -32,6 +32,17 @@ const SIDEBAR_ITEMS: SidebarItem[] = [
     keywords: ['government', 'schemes', 'योजना', 'सरकार', 'அரசு', 'திட்டம்', 'सरकारी योजना']
   },
   {
+<<<<<<< HEAD
+=======
+    id: 'deaf-mode',
+    title: 'Deaf Mode',
+    icon: '🧏',
+    href: '/deaf-mode',
+    color: 'bg-green-500 hover:bg-green-600',
+    keywords: ['deaf', 'hearing', 'sign', 'बधिर', 'सुनना', 'செவிடு', 'கேட்க']
+  },
+  {
+>>>>>>> 16046fa464964c20bd9bd45317c5538d9e2ffc2a
     id: 'learning-hub',
     title: 'Learning Hub',
     icon: '📚',
