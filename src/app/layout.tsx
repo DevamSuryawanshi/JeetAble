@@ -9,6 +9,14 @@ const HumanLikeAIAgent = dynamic(() => import('@/components/HumanLikeAIAgent'), 
   ssr: false
 })
 
+const AutoVoiceAssistant = dynamic(() => import('@/components/AutoVoiceAssistant'), {
+  ssr: false
+})
+
+const EmergencyVoiceAssistant = dynamic(() => import('@/components/EmergencyVoiceAssistant'), {
+  ssr: false
+})
+
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
@@ -31,6 +39,8 @@ export default function RootLayout({
             {children}
           </LayoutWrapper>
           <HumanLikeAIAgent />
+          <AutoVoiceAssistant />
+          <EmergencyVoiceAssistant />
         </AccessibilityProvider>
       </body>
     </html>

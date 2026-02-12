@@ -1,15 +1,10 @@
 'use client'
 
-<<<<<<< HEAD
 import { useState } from 'react'
-=======
-import { useState, useEffect } from 'react'
->>>>>>> 16046fa464964c20bd9bd45317c5538d9e2ffc2a
 import Navbar from '@/components/Navbar'
 import BackButton from '@/components/BackButton'
 import VoiceAssistant from '@/components/VoiceAssistant'
 import { useAccessibility } from '@/components/AccessibilityProvider'
-<<<<<<< HEAD
 
 interface Job {
   id: number
@@ -69,37 +64,6 @@ export default function JobPortal() {
       salary: '$60,000 - $75,000'
     }
   ]
-=======
-import { JobModel } from '@/models/JobModel'
-
-export default function JobPortal() {
-  const [selectedFilters, setSelectedFilters] = useState<string[]>([])
-  const [selectedJob, setSelectedJob] = useState<JobModel | null>(null)
-  const [jobs, setJobs] = useState<JobModel[]>([])
-  const [loading, setLoading] = useState(true)
-  const { speak } = useAccessibility()
-
-  useEffect(() => {
-    fetchJobs()
-  }, [])
-
-  const fetchJobs = async () => {
-    try {
-      setLoading(true)
-      const response = await fetch('/api/jobs-portal')
-      const data = await response.json()
-      
-      if (data.success) {
-        setJobs(data.data)
-        speak(`Found ${data.data.length} accessible job opportunities`)
-      }
-    } catch (error) {
-      console.error('Error fetching jobs:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
->>>>>>> 16046fa464964c20bd9bd45317c5538d9e2ffc2a
 
   const filters = [
     'Remote Work',
@@ -121,17 +85,10 @@ export default function JobPortal() {
 
   const filteredJobs = jobs.filter(job => 
     selectedFilters.length === 0 || 
-<<<<<<< HEAD
     selectedFilters.some(filter => job.accessibility.includes(filter))
   )
 
   const handleJobClick = (job: Job) => {
-=======
-    selectedFilters.some(filter => job.description.toLowerCase().includes(filter.toLowerCase()))
-  )
-
-  const handleJobClick = (job: JobModel) => {
->>>>>>> 16046fa464964c20bd9bd45317c5538d9e2ffc2a
     setSelectedJob(job)
     speak(`Opening job details for ${job.title} at ${job.company}`)
   }
@@ -217,21 +174,13 @@ export default function JobPortal() {
                       <p className="text-lg text-primary-600">{job.company}</p>
                     </div>
                     <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
-<<<<<<< HEAD
                       {job.type}
-=======
-                      Full-time
->>>>>>> 16046fa464964c20bd9bd45317c5538d9e2ffc2a
                     </span>
                   </div>
                   
                   <div className="mb-3">
                     <p className="text-gray-600 mb-2">📍 {job.location}</p>
-<<<<<<< HEAD
                     <p className="text-gray-600 mb-2">💰 {job.salary}</p>
-=======
-                    <p className="text-gray-600 mb-2">💰 {job.salaryRange}</p>
->>>>>>> 16046fa464964c20bd9bd45317c5538d9e2ffc2a
                   </div>
 
                   <div className="mb-3">
@@ -239,7 +188,6 @@ export default function JobPortal() {
                   </div>
 
                   <div className="flex flex-wrap gap-2">
-<<<<<<< HEAD
                     {job.accessibility.map((feature, index) => (
                       <span
                         key={index}
@@ -248,11 +196,6 @@ export default function JobPortal() {
                         ♿ {feature}
                       </span>
                     ))}
-=======
-                    <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm">
-                      ♿ Accessible Workplace
-                    </span>
->>>>>>> 16046fa464964c20bd9bd45317c5538d9e2ffc2a
                   </div>
                 </div>
               ))}

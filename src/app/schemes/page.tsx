@@ -42,7 +42,6 @@ export default function GovernmentSchemes() {
   const fetchSchemes = async (category?: string) => {
     try {
       setIsLoading(true)
-<<<<<<< HEAD
       const categoryParam = category && category !== 'All Categories' ? `?category=${encodeURIComponent(category)}` : ''
       const response = await fetch(`/api/schemes${categoryParam}`)
       const data = await response.json()
@@ -51,22 +50,6 @@ export default function GovernmentSchemes() {
         setSchemes(data.data)
         setLastUpdated(data.lastUpdated)
         speak(`Loaded ${data.data.length} government schemes`)
-=======
-      const response = await fetch('/api/government-schemes')
-      const data = await response.json()
-      
-      if (data.success) {
-        let filteredSchemes = data.data
-        if (category && category !== 'All Categories') {
-          filteredSchemes = data.data.filter((scheme: any) => 
-            scheme.schemeName.toLowerCase().includes(category.toLowerCase()) ||
-            scheme.description.toLowerCase().includes(category.toLowerCase())
-          )
-        }
-        setSchemes(filteredSchemes)
-        setLastUpdated(new Date().toISOString())
-        speak(`Loaded ${filteredSchemes.length} government schemes`)
->>>>>>> 16046fa464964c20bd9bd45317c5538d9e2ffc2a
       } else {
         setError('Failed to load schemes')
         speak('Failed to load government schemes')
@@ -176,7 +159,6 @@ export default function GovernmentSchemes() {
                   <div className="flex justify-between items-start mb-4">
                     <div className="flex-1">
                       <h2 className="text-2xl font-bold text-gray-900 mb-2 leading-tight">
-<<<<<<< HEAD
                         {scheme.title}
                       </h2>
                       <div className="flex flex-wrap items-center gap-2 mb-3">
@@ -185,22 +167,11 @@ export default function GovernmentSchemes() {
                         </span>
                         <span className="text-gray-500 text-sm">
                           • {scheme.ministry}
-=======
-                        {scheme.schemeName}
-                      </h2>
-                      <div className="flex flex-wrap items-center gap-2 mb-3">
-                        <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
-                          Government Scheme
-                        </span>
-                        <span className="text-gray-500 text-sm">
-                          • {new Date(scheme.createdAt).toLocaleDateString()}
->>>>>>> 16046fa464964c20bd9bd45317c5538d9e2ffc2a
                         </span>
                       </div>
                     </div>
                   </div>
                   
-<<<<<<< HEAD
                   <p className="text-gray-700 text-lg leading-relaxed mb-6">
                     {scheme.description}
                   </p>
@@ -210,39 +181,16 @@ export default function GovernmentSchemes() {
                       onClick={() => readAloud(scheme.title, scheme.description, scheme.ministry)}
                       className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-300 transition-colors"
                       aria-label={`Read aloud: ${scheme.title}`}
-=======
-                  <p className="text-gray-700 text-lg leading-relaxed mb-4">
-                    {scheme.description}
-                  </p>
-                  
-                  <p className="text-gray-600 mb-6">
-                    <strong>Eligibility:</strong> {scheme.eligibility}
-                  </p>
-                  
-                  <div className="flex flex-wrap gap-3">
-                    <button
-                      onClick={() => readAloud(scheme.schemeName, scheme.description, 'Government')}
-                      className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-300 transition-colors"
-                      aria-label={`Read aloud: ${scheme.schemeName}`}
->>>>>>> 16046fa464964c20bd9bd45317c5538d9e2ffc2a
                     >
                       🔊 Read Aloud
                     </button>
                     
                     <button
-<<<<<<< HEAD
                       onClick={() => openScheme(scheme.link, scheme.title)}
                       className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 transition-colors"
                       aria-label={`Visit official website: ${scheme.title}`}
                     >
                       🌐 Visit Official Site
-=======
-                      onClick={() => openScheme(scheme.applicationLink, scheme.schemeName)}
-                      className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 transition-colors"
-                      aria-label={`Visit official website: ${scheme.schemeName}`}
-                    >
-                      🌐 Apply Now
->>>>>>> 16046fa464964c20bd9bd45317c5538d9e2ffc2a
                     </button>
                   </div>
                 </article>
